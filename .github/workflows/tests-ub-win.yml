@@ -2,18 +2,34 @@ name: Tests-ub-win
 
 on:
    push:
-     branches: [main, release-*]
+     branches: [main, release-*, te-*]
    pull_request:
      branches: [main, release-*, develop, fe-*]
      types: [ opened, reopened ]
    workflow_call:
-#     inputs:
-#       ref:
-#         required: true
-#         type: string
+     inputs:
+       ref:
+         required: true
+         type: string
 
 jobs:
+  pre:
+    runs-on: ubuntu-latest
+    steps:
+      - id: ref
+        run: |
+          if [ ${{inputs.ref}} == '' ]; then
+            echo "value=${{github.ref_name}}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{inputs.ref}}" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+    outputs:
+      ref: ${{ steps.ref.outputs.value }}
+
   test:
+    needs: pre
     strategy:
       fail-fast: false
       matrix:
@@ -35,4 +51,4 @@ jobs:
         py: ${{matrix.py}}
         lint: ${{matrix.lint}}
         typecheck: ${{matrix.typecheck}}
-#        ref: ${{inputs.ref}}
+        ref: ${{needs.pre.outputs.ref}}
