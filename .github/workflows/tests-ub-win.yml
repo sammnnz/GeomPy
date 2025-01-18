@@ -2,9 +2,15 @@ name: Tests-ub-win
 
 on:
    push:
-     branches: [main, release-*, develop, fe-*]
+     branches: [main, release-*]
    pull_request:
      branches: [main, release-*, develop, fe-*]
+     types: [ opened, reopened ]
+   workflow_call:
+#     inputs:
+#       ref:
+#         required: true
+#         type: string
 
 jobs:
   test:
@@ -29,3 +35,4 @@ jobs:
         py: ${{matrix.py}}
         lint: ${{matrix.lint}}
         typecheck: ${{matrix.typecheck}}
+#        ref: ${{inputs.ref}}
