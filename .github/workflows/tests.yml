@@ -61,7 +61,7 @@ jobs:
         with:
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: .coverage/.coverage
+          path: ./.coverage/.coverage
 #        env:
 #          path: ${{ github.workspace }}
 #      - name: Linter
