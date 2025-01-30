@@ -111,6 +111,8 @@ jobs:
           merge-multiple: true
       - name: Rename coverage data files (for combine)
         run: |
+          pwd
+          ls -R
           for file in `ls -R .coverage/.temp`; do
               echo "$file"
               mv .coverage/.temp/$file .coverage/.temp/.$file
