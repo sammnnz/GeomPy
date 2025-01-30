@@ -59,10 +59,14 @@ jobs:
       - name: Upload coverage artefact
         uses: actions/upload-artifact@v4
         with:
-          if-no-files-found: error
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
-#          overwrite: true
+          overwrite: true
           path: .coverage/coverage.1
+      - name: Delete coverage artefact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
+          failOnError: false
 #        env:
 #          path: ${{ github.workspace }}
 #      - name: Linter
