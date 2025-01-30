@@ -46,6 +46,13 @@ on:
          options:
          - 'true'
          - 'false'
+       codecov:
+         required: false
+         type: choice
+         default: 'false'
+         options:
+           - 'true'
+           - 'false'
 
 jobs:
   pre:
@@ -88,6 +95,45 @@ jobs:
        typecheck: ${{needs.pre.outputs.typecheck}}
      secrets:
        token: ${{secrets.GITHUB_TOKEN}}
+
+  codecov-deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ inputs.codecov }}
+    steps:
+      - name: Download coverage artefact
+        uses: actions/download-artifact@v4.1.8
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./.coverage/.temp/
+          pattern: geompy-cov-*
+          merge-multiple: true
+      - name: Rename coverage data files (for combine)
+        run: |
+          for file in `ls -R .coverage/.temp/`; do
+              echo "$file"
+              mv .coverage/.temp/$file .coverage/.temp/.$file
+              echo "$file"
+          done
+        shell: bash
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage==7.2.7
+      - name: Combine coverage data files
+        run: |
+          pwd
+          cd ${{ github.workspace }}/.coverage/.temp/
+          ls -R
+          coverage combine
+          ls -R
+          coverage xml
+          ls -R
 
   # _echo:
   #    needs: pre
