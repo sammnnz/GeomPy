@@ -113,7 +113,7 @@ jobs:
         run: |
           pwd
           ls -R
-          ls -R temp
+          ls -R .temp
           for file in `find .temp -type f`; do
               echo "$file"
               mv .temp/$file .temp/.$file
