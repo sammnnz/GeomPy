@@ -48,9 +48,9 @@ jobs:
       - name: Change .coverage file name
         run: |
           mkdir .coverage
-          echo hello > .coverage/.coverage
-          cat .coverage/.coverage
-          realpath .coverage/.coverage
+          echo hello > .coverage/coverage.txt
+          cat .coverage/coverage.txt
+          realpath .coverage/coverage.txt
 #          mv _coverage/.coverage.t _coverage/.coverage-${{inputs.os}}-py${{inputs.py}}.t
 #          realpath .coverage/.coverage-${{inputs.os}}-py${{inputs.py}}
 #          echo "${{ github.workspace }}"
@@ -59,9 +59,10 @@ jobs:
       - name: Upload coverage artefact
         uses: actions/upload-artifact@v4
         with:
+          if-no-files-found: error
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: .coverage/
+          path: .coverage/coverage.txt
 #        env:
 #          path: ${{ github.workspace }}
 #      - name: Linter
