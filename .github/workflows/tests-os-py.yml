@@ -106,12 +106,12 @@ jobs:
         continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./.coverage/.temp/
+          path: .coverage/.temp/
           pattern: geompy-cov-*
           merge-multiple: true
       - name: Rename coverage data files (for combine)
         run: |
-          for file in `ls -R .coverage/.temp/`; do
+          for file in `ls -R .coverage/.temp`; do
               echo "$file"
               mv .coverage/.temp/$file .coverage/.temp/.$file
               echo "$file"
