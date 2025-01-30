@@ -48,9 +48,9 @@ jobs:
       - name: Change .coverage file name
         run: |
           mkdir .coverage
-          echo hello > .coverage/.coverage.1
-          cat .coverage/.coverage.1
-          realpath .coverage/.coverage.1
+          echo hello > .coverage/coverage.1
+          cat .coverage/coverage.1
+          realpath .coverage/coverage.1
 #          mv _coverage/.coverage.t _coverage/.coverage-${{inputs.os}}-py${{inputs.py}}.t
 #          realpath .coverage/.coverage-${{inputs.os}}-py${{inputs.py}}
 #          echo "${{ github.workspace }}"
@@ -62,7 +62,7 @@ jobs:
           if-no-files-found: error
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
 #          overwrite: true
-          path: .coverage/.coverage.1
+          path: .coverage/coverage.1
 #        env:
 #          path: ${{ github.workspace }}
 #      - name: Linter
