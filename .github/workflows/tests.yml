@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: sammnnz/geompy
+#          repository: sammnnz/geompy
           ref: ${{inputs.ref}}
       - name: Setup Python ${{inputs.py}}
         uses: actions/setup-python@v2
@@ -61,7 +61,7 @@ jobs:
         with:
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: ./.coverage/.coverage
+          path: ./.coverage/.coverage/
 #        env:
 #          path: ${{ github.workspace }}
 #      - name: Linter
