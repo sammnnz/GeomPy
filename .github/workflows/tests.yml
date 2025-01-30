@@ -46,7 +46,7 @@ jobs:
           pytest --cov-config=.coveragerc --verbose --color=yes --assert=plain
       - name: Change '.coverage' file name
         run: |
-          mv .coverage/coverage.1 .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.1
+          mv .coverage/coverage.-1 .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.-1
 #          mkdir .coverage
 #          echo hello > .coverage/coverage.1
 #          cat .coverage/coverage.1
@@ -60,7 +60,7 @@ jobs:
         with:
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.1
+          path: .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.-1
 #      - name: Delete coverage artefact
 #        uses: geekyeggo/delete-artifact@v5
 #        with:
