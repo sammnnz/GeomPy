@@ -42,26 +42,46 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .[testing,linting,typechecking]
-      - name: Download coverage artefact
-        continue-on-error: true
-        uses: actions/download-artifact@v4.1.8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          merge-multiple: true
-          name: geompy-cov
-          path: .coverage
+      #- name: Download coverage artefact
+      #  continue-on-error: true
+      #  uses: actions/download-artifact@v4.1.8
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    merge-multiple: true
+      #    name: geompy-cov
+      #    path: .coverage
       - name: Test with pytest
         run: |
-          pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain
+          pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain --junitxml=junit.xml
           coverage xml
-      - name: Upload coverage artefact
-        uses: actions/upload-artifact@v4
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
-          name: geompy-cov
-          overwrite: true
-          path: |
-            .coverage/coverage.-1
-            coverage.xml
+          file: ./junit.xml
+          flags: python${{inputs.py}}
+          name: geompy-${{inputs.os}}-${{inputs.py}}
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          # https://docs.codecov.com/docs/commit-status#disabling-a-status
+          patch: off
+          project: off
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+      #- name: Upload coverage artefact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: geompy-cov
+      #    overwrite: true
+      #    path: |
+      #      .coverage/coverage.-1
+      #      coverage.xml
       - name: Linter
         if: ${{inputs.lint}}
         run: |

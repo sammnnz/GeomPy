@@ -96,25 +96,36 @@ jobs:
      secrets:
        token: ${{secrets.GITHUB_TOKEN}}
 
-  codecov-deploy:
-    needs: tests-call
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check
-        if: ${{inputs.codecov == 'false'}}
-        run: |
-          echo "codecov argument is false" && exit 1
-      - name: Download coverage artefact
-        uses: actions/download-artifact@v4.1.8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          merge-multiple: true
-          name: geompy-cov
-          path: .temp
-      - name: Codecov deploy
-        run: |
-          cat .temp/coverage.xml
+#  codecov-deploy:
+#    needs: tests-call
+#    continue-on-error: true
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check
+#        if: ${{inputs.codecov == 'false'}}
+#        run: |
+#          echo "codecov argument is false" && exit 1
+#      - name: Download coverage artefact
+#        uses: actions/download-artifact@v4.1.8
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          merge-multiple: true
+#          name: geompy-cov
+#          path: .temp
+#      - name: Codecov deploy
+#        run: |
+#          # cat .temp/coverage.xml
+#          uses: codecov/codecov-action@v3
+#          with:
+#            token: ${{ secrets.CODECOV_TOKEN }}
+#            fail_ci_if_error: true
+#            file: .temp/coverage.xml
+#            flags: unittests
+#            verbose: true
+#            # https://docs.codecov.com/docs/commit-status#disabling-a-status
+#            patch: off
+#            project: off
+
 #      - name: Rename coverage data files (for combine)
 #        run: |
 #          for file in .temp/*; do
@@ -140,16 +151,16 @@ jobs:
 #          find -type f
 #          coverage xml
 #          find -type f
-
-  post:
-    needs: codecov-deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete coverage artefact
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: geompy-cov
-          failOnError: false
+#
+#  post:
+#    needs: codecov-deploy
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Delete coverage artefact
+#        uses: geekyeggo/delete-artifact@v5
+#        with:
+#          name: geompy-cov
+#          failOnError: false
 
   # _echo:
   #    needs: pre
