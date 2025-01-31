@@ -113,7 +113,6 @@ jobs:
         run: |
           find .temp -type f
           echo "---------"
-#          cd .temp
           for file in .temp/*; do
               echo "$file"
               mv .temp/${file:6} .temp/.${file:6}
