@@ -134,9 +134,9 @@ jobs:
           find .temp
           cd ${{ github.workspace }}/.temp/
           find -type f
-          coverage combine
+          python -m coverage combine
           find -type f
-          coverage xml
+          python -m coverage xml
           find -type f
 
   # _echo:
