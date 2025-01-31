@@ -80,13 +80,26 @@ jobs:
                exit 1
              fi
         shell: bash
+      - id: codecov
+        run: |
+          if [ ${{inputs.codecov}} == 'true' ]; then
+            echo "value=true" >> $GITHUB_OUTPUT
+          elif [ ${{inputs.codecov}} == 'false' ]; then
+            echo "value=" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid argument: lint must be true or false."
+            exit 1
+          fi
+        shell: bash
 
    outputs:
       lint: ${{ steps.lint.outputs.value }}
       typecheck: ${{ steps.typecheck.outputs.value }}
+      codecov: ${{ steps.codecov.outputs.value }}
 
   tests-call:
      needs: pre
+     continue-on-error: true
      uses: ./.github/workflows/tests.yml
      with:
        os: ${{inputs.os}}
@@ -97,13 +110,13 @@ jobs:
        token: ${{secrets.GITHUB_TOKEN}}
 
   codecov-deploy:
-    runs-on: ubuntu-latest
+    if: ${{needs.pre.outputs.codecov}}
     needs: tests-call
-    if: ${{ inputs.codecov }}
+    continue-on-error: true
+    runs-on: ubuntu-latest
     steps:
       - name: Download coverage artefact
         uses: actions/download-artifact@v4.1.8
-        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           merge-multiple: true
@@ -111,14 +124,10 @@ jobs:
           pattern: geompy-cov-*
       - name: Rename coverage data files (for combine)
         run: |
-          find .temp -type f
-          echo "---------"
           for file in .temp/*; do
               echo "$file"
               mv .temp/${file:6} .temp/.${file:6}
           done
-          echo "---------"
-          find .temp -type f
         shell: bash
       - name: Setup Python 3.10
         uses: actions/setup-python@v2
@@ -138,6 +147,16 @@ jobs:
           find -type f
           coverage xml
           find -type f
+
+  post:
+    needs: codecov-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete coverage artefact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
+          failOnError: false
 
   # _echo:
   #    needs: pre
