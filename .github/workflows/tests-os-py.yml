@@ -111,14 +111,15 @@ jobs:
           pattern: geompy-cov-*
       - name: Rename coverage data files (for combine)
         run: |
-          pwd
-          ls -R
-          ls -R .temp
-          for file in `find .temp -type f`; do
+          find .temp -type f
+          echo "---------"
+          cd .temp
+          for file in .temp/*; do
               echo "$file"
-              mv .temp/$file .temp/.$file
+              mv .temp/${file:6} .temp/.${file:6}
           done
-          ls -R .temp
+          echo "---------"
+          find .temp -type f
         shell: bash
       - name: Setup Python 3.10
         uses: actions/setup-python@v2
