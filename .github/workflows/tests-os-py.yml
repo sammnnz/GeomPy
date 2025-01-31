@@ -80,22 +80,10 @@ jobs:
                exit 1
              fi
         shell: bash
-      - id: codecov
-        run: |
-          if [ ${{inputs.codecov}} == 'true' ]; then
-            echo "value=true" >> $GITHUB_OUTPUT
-          elif [ ${{inputs.codecov}} == 'false' ]; then
-            echo "value=" >> $GITHUB_OUTPUT
-          else
-            echo "Invalid argument: lint must be true or false."
-            exit 1
-          fi
-        shell: bash
 
    outputs:
       lint: ${{ steps.lint.outputs.value }}
       typecheck: ${{ steps.typecheck.outputs.value }}
-      codecov: ${{ steps.codecov.outputs.value }}
 
   tests-call:
      needs: pre
@@ -109,11 +97,14 @@ jobs:
        token: ${{secrets.GITHUB_TOKEN}}
 
   codecov-deploy:
-    if: ${{needs.pre.outputs.codecov}}
     needs: tests-call
     continue-on-error: true
     runs-on: ubuntu-latest
     steps:
+      - name: Check
+        if: ${{inputs.codecov == 'false'}}
+        run: |
+          echo "codecov argument is false" && exit 1
       - name: Download coverage artefact
         uses: actions/download-artifact@v4.1.8
         with:
