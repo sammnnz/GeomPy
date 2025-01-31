@@ -27,6 +27,7 @@ on:
 
 jobs:
   test:
+    continue-on-error: true
     runs-on: ${{inputs.os}}
     steps:
       - uses: actions/checkout@v3

@@ -99,7 +99,6 @@ jobs:
 
   tests-call:
      needs: pre
-     continue-on-error: true
      uses: ./.github/workflows/tests.yml
      with:
        os: ${{inputs.os}}
