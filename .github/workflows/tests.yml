@@ -49,14 +49,14 @@ jobs:
           pwd
           mkdir .coverage
           echo hello > .coverage/coverage.-1
-          mv .coverage/coverage.-1 .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.-1
+          mv .coverage/coverage.-1 .coverage/coverage.${{inputs.os}}.py${{inputs.py}}.-1
         shell: bash
       - name: Upload coverage artefact
         uses: actions/upload-artifact@v4
         with:
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: .coverage/coverage-${{inputs.os}}-py${{inputs.py}}.-1
+          path: .coverage/coverage.${{inputs.os}}.py${{inputs.py}}.-1
       - name: Linter
         if: ${{inputs.lint}}
         run: |
