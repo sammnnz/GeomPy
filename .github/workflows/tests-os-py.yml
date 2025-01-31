@@ -132,7 +132,7 @@ jobs:
         run: |
           pwd
           find .temp
-          cd ${{ github.workspace }}/.coverage/.temp/
+          cd ${{ github.workspace }}/.temp/
           find -type f
           coverage combine
           find -type f
