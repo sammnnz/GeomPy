@@ -95,6 +95,7 @@ jobs:
        typecheck: ${{needs.pre.outputs.typecheck}}
      secrets:
        token: ${{secrets.GITHUB_TOKEN}}
+       codecov_token: ${{secrets.CODECOV_TOKEN}}
 
 #  codecov-deploy:
 #    needs: tests-call

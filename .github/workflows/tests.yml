@@ -24,6 +24,9 @@ on:
      secrets:
        token:
          required: true
+       # https://giters.com/codecov/codecov-action/issues/1738
+       codecov_token:
+         required: true
 
 jobs:
   test:
@@ -52,7 +55,7 @@ jobs:
       #    path: .coverage
       - name: Test with pytest
         run: |
-          pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain --junitxml=junit.xml
+          pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain --junitxml=./junit.xml
           coverage xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -61,7 +64,7 @@ jobs:
           file: ./junit.xml
           flags: python${{inputs.py}}
           name: geompy-${{inputs.os}}-${{inputs.py}}
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.codecov_token }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -70,9 +73,7 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           # https://docs.codecov.com/docs/commit-status#disabling-a-status
-          patch: off
-          project: off
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.codecov_token }}
           verbose: true
       #- name: Upload coverage artefact
       #  uses: actions/upload-artifact@v4
