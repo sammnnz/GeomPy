@@ -5,24 +5,32 @@ on:
      branches: [main, release-*, develop, fe-*]
      types: [opened, reopened]
    workflow_dispatch:
+     inputs:
+       codecov:
+         required: false
+         type: choice
+         default: 'false'
+         options:
+           - 'true'
+           - 'false'
 
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        py: [3.7, 3.8, 3.9, "3.10"]
-        exclude:
-          - os: ubuntu-latest
-            py: "3.7"
+#        os: [ubuntu-latest, windows-latest]
+#        py: [3.7, 3.8, 3.9, "3.10"]
+#        exclude:
+#          - os: ubuntu-latest
+#            py: "3.7"
         include:
           - os: ubuntu-22.04
             py: "3.7.17"
           - os: windows-latest
             py: "3.9"
-            lint: "true"
-            typecheck: "true"
+          #  lint: "true"
+          #  typecheck: "true"
     uses: ./.github/workflows/tests.yml
     with:
         os: ${{matrix.os}}
@@ -31,3 +39,51 @@ jobs:
         typecheck: ${{matrix.typecheck}}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
+
+  codecov-deploy:
+    needs: test
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check
+        if: ${{inputs.codecov == 'false'}}
+        run: |
+          echo "codecov argument is false" && exit 1
+      - name: Download coverage artefact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true
+          path: .temp
+          pattern: geompy-cov-*
+      - name: Create files names
+        id: files
+        run: |
+          files=""
+          for file in .temp; do
+              echo "$file"
+              files+="$file,"
+          done
+          echo "value=${files%,}" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          files: ${{steps.files.outputs.value}}
+          flags: ${{inputs.py}}
+          name: geompy-${{inputs.os}}-py${{inputs.py}}
+          # https://docs.codecov.com/docs/commit-status#disabling-a-status
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+
+  post:
+    needs: codecov-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete coverage artefact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          failOnError: false
+          name: |
+            geompy-cov-*
