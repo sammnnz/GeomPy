@@ -59,6 +59,7 @@ jobs:
       - name: Create files names
         id: files
         run: |
+          find .temp -type f
           files=""
           for file in .temp; do
               echo "$file"

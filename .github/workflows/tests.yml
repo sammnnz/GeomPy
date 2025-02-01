@@ -55,8 +55,7 @@ jobs:
       #    path: .coverage
       - name: Test with pytest
         run: |
-          pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain --junitxml=./junit.xml
-          coverage xml
+          pytest --cov-config=.coveragerc --cov-append --cov-report xml:coverage-${{inputs.os}}-py${{inputs.py}}.xml --verbose --color=yes --assert=plain
       #- name: Upload test results to Codecov
       #  if: ${{ !cancelled() }}
       #  uses: codecov/test-results-action@v1
@@ -80,7 +79,7 @@ jobs:
         with:
           name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
           overwrite: true
-          path: ./coverage.xml
+          path: ./coverage-${{inputs.os}}-py${{inputs.py}}.xml
           # .coverage/coverage.-1
       - name: Linter
         if: ${{inputs.lint}}
