@@ -57,21 +57,21 @@ jobs:
         run: |
           pytest --cov-config=.coveragerc --cov-append --verbose --color=yes --assert=plain --junitxml=./junit.xml
           coverage xml
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          file: ./junit.xml
-          flags: python${{inputs.py}}
-          name: geompy-${{inputs.os}}-${{inputs.py}}
-          token: ${{ secrets.codecov_token }}
+      #- name: Upload test results to Codecov
+      #  if: ${{ !cancelled() }}
+      #  uses: codecov/test-results-action@v1
+      #  with:
+      #    file: ./junit.xml
+      #    flags: python${{inputs.py}}
+      #    name: geompy-${{inputs.os}}-${{inputs.py}}
+      #    token: ${{ secrets.codecov_token }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
           file: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
+          flags: ${{inputs.py}}
+          name: geompy-${{inputs.os}}-${{inputs.py}}
           # https://docs.codecov.com/docs/commit-status#disabling-a-status
           token: ${{ secrets.codecov_token }}
           verbose: true
