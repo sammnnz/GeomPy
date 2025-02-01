@@ -1,0 +1,22 @@
+name: Tests-ub-win
+
+on:
+  push:
+     branches: [te-*]
+  workflow_dispatch:
+
+jobs:
+  codecov-deploy:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          file: coverage.xml
+          flags: unittests
+          name: _test-cov
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
