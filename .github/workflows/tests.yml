@@ -73,7 +73,7 @@ jobs:
         with:
           fail_ci_if_error: true
           file: ./coverage.xml
-          #flags: ${{inputs.py}}
+          flags: py${{inputs.py}}, ${{inputs.os}}
           name: tests
           # https://docs.codecov.com/docs/commit-status#disabling-a-status
           token: ${{ secrets.codecov_token }}
