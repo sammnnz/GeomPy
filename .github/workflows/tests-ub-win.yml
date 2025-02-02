@@ -27,7 +27,7 @@ jobs:
         include:
           - os: ubuntu-22.04
             py: "3.7.17"
-          - os: windows-latest
+          - os: ubuntu-latest
             py: "3.9"
           #  lint: "true"
           #  typecheck: "true"

@@ -65,13 +65,16 @@ jobs:
       #    flags: python${{inputs.py}}
       #    name: geompy-${{inputs.os}}-${{inputs.py}}
       #    token: ${{ secrets.codecov_token }}
+      - name: Print coverage.xml
+        run: |
+          cat ./coverage.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
           file: ./coverage.xml
           #flags: ${{inputs.py}}
-          #name: geompy-${{inputs.os}}-py${{inputs.py}}
+          name: tests
           # https://docs.codecov.com/docs/commit-status#disabling-a-status
           token: ${{ secrets.codecov_token }}
           verbose: true
