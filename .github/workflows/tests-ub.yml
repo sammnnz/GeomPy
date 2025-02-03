@@ -13,8 +13,8 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         py: [3.7, "3.9"]
-        codecov: [true]
-        cov-json: [true]
+        codecov: ["true"]
+        cov-json: ["true"]
         exclude:
           - os: ubuntu-latest
             py: "3.7"
