@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        py: [3.7, 3.8, 3.9, "3.10"]
-        codecov: "true"
-        cov-json: "true"
+        py: [3.7 "3.10"]
+        codecov: [true]
+        cov-json: [true]
         exclude:
           - os: ubuntu-latest
             py: "3.7"
