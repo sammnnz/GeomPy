@@ -147,6 +147,7 @@ def test_Render_polygon(render_object):
     else:
         assert True
 
+
 def test_random_points():
     center, radius, count = (0, 2), 3, 20
     points = random_points(count, radius, center[0], center[1])

@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        py: [3.7 "3.10"]
+        py: [3.7, "3.9"]
         codecov: [true]
         cov-json: [true]
         exclude:
@@ -38,6 +38,7 @@ jobs:
         lint: ${{matrix.lint}}
         typecheck: ${{matrix.typecheck}}
         codecov: ${{matrix.codecov}}
+        cov-json: ${{matrix.cov-json}}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
