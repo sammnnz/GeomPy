@@ -1,4 +1,4 @@
-name: Tests-mac
+name: Tests-win
 
 on:
    pull_request:
@@ -11,14 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
+        os: [windows-latest]
         py: [3.7, 3.8, 3.9, "3.10"]
-        exclude:
-          - os: macos-latest
-            py: "3.7"
-        include:
-          - os: macos-13
-            py: "3.7.17"
     uses: ./.github/workflows/tests.yml
     with:
         os: ${{matrix.os}}

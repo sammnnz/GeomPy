@@ -1,45 +1,63 @@
-name: Tests-ub-win
+name: Tests-ub
 
 on:
    pull_request:
      branches: [main, release-*, develop, fe-*]
      types: [opened, reopened]
    workflow_dispatch:
-#     inputs:
-#       codecov:
-#         required: false
-#         type: choice
-#         default: 'false'
-#         options:
-#           - 'true'
-#           - 'false'
 
 jobs:
-  test:
+  tests:
     strategy:
       fail-fast: false
       matrix:
-#        os: [ubuntu-latest, windows-latest]
-#        py: [3.7, 3.8, 3.9, "3.10"]
-#        exclude:
-#          - os: ubuntu-latest
-#            py: "3.7"
+        os: [ubuntu-latest]
+        py: [3.7, 3.8, 3.9, "3.10"]
+        codecov: "true"
+        cov-json: "true"
+        exclude:
+          - os: ubuntu-latest
+            py: "3.7"
+            codecov: "true"
+            cov-json: "true"
         include:
           - os: ubuntu-22.04
             py: "3.7.17"
+            codecov: "true"
+            cov-json: "true"
           - os: ubuntu-latest
             py: "3.9"
-          #  lint: "true"
-          #  typecheck: "true"
+            lint: "true"
+            typecheck: "true"
+            codecov: "true"
+            cov-json: "true"
     uses: ./.github/workflows/tests.yml
     with:
         os: ${{matrix.os}}
         py: ${{matrix.py}}
         lint: ${{matrix.lint}}
         typecheck: ${{matrix.typecheck}}
+        codecov: ${{matrix.codecov}}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
+
+  coverage-badge:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download coverage artefact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true
+          path: .temp
+          pattern: geompy-cov-*
+      - name: Print artefact
+        run: |
+          for file in `find .temp -type f`; do
+            echo "$file"
+          done
 
 #  codecov-deploy:
 #    needs: test

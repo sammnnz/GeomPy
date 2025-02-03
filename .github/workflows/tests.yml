@@ -21,6 +21,14 @@ on:
          required: false
          type: string
          default: ''
+       codecov:
+         required: false
+         type: string
+         default: ''
+       cov-json:
+         required: false
+         type: string
+         default: ''
      secrets:
        token:
          required: true
@@ -29,8 +37,8 @@ on:
          required: false
 
 jobs:
-  test:
-    continue-on-error: true
+  tests:
+    #continue-on-error: true
     runs-on: ${{inputs.os}}
     steps:
       - uses: actions/checkout@v3
@@ -45,46 +53,57 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .[testing,linting,typechecking]
-      #- name: Download coverage artefact
-      #  continue-on-error: true
-      #  uses: actions/download-artifact@v4.1.8
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    merge-multiple: true
-      #    name: geompy-cov
-      #    path: .coverage
       - name: Test with pytest
         run: |
           pytest --cov-config=.coveragerc --verbose --color=yes --assert=plain
-          coverage xml
-      #- name: Upload test results to Codecov
-      #  if: ${{ !cancelled() }}
-      #  uses: codecov/test-results-action@v1
-      #  with:
-      #    file: ./junit.xml
-      #    flags: python${{inputs.py}}
-      #    name: geompy-${{inputs.os}}-${{inputs.py}}
-      #    token: ${{ secrets.codecov_token }}
+      - name: Create coverage report in xml for codecov
+        if: ${{inputs.codecov}}
+        run: |
+          coverage xml -o coverage.xml
       - name: Print coverage.xml
+        if: ${{inputs.codecov}}
         run: |
           cat ./coverage.xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage report (xml) artefact
+        if: ${{inputs.codecov}}
+        uses: actions/upload-artifact@v4
         with:
-          fail_ci_if_error: true
-          file: ./coverage.xml
-          flags: py${{inputs.py}}
-          name: tests
-          # https://docs.codecov.com/docs/commit-status#disabling-a-status
-          token: ${{ secrets.codecov_token }}
-          verbose: true
-      #- name: Upload coverage artefact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
-      #   overwrite: true
-      #   path: coverage-${{inputs.os}}-py${{inputs.py}}.xml
-          # .coverage/coverage.-1
+          name: geompy-codecov-${{inputs.os}}-py${{inputs.py}}
+          overwrite: true
+          path: coverage.xml
+      - name: Create coverage report in json
+        if: ${{inputs.cov-json}}
+        run: |
+          coverage json -o coverage.json
+        shell: bash
+      - name:
+        continue-on-error: true
+        if: ${{inputs.cov-json}}
+        # https://jqlang.org/download/
+        run: |
+          if [[ ${{inputs.os}} =~ ^windows.* ]]; then
+            winget install jqlang.jq
+          elif [[ ${{inputs.os}} =~ ^ubuntu.* ]]; then
+            sudo apt-get install jq
+          elif [[ ${{inputs.os}} =~ ^mac.* ]]; then
+            brew install jq
+          else
+            echo "Invalid argument: os must be mac, ubuntu or windows."
+            exit 1
+          fi
+          
+          jq ".totals" coverage.json >> cov-${{inputs.os}}-py${{inputs.py}}.json
+      - name: Print json
+        if: ${{inputs.cov-json}}
+        run: |
+          cat ./cov-${{inputs.os}}-py${{inputs.py}}.json
+      - name: Upload coverage report (json) artefact
+        if: ${{inputs.cov-json}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: geompy-cov-${{inputs.os}}-py${{inputs.py}}
+          overwrite: true
+          path: cov-${{inputs.os}}-py${{inputs.py}}.json
       - name: Linter
         if: ${{inputs.lint}}
         run: |
@@ -93,3 +112,32 @@ jobs:
         if: ${{inputs.typecheck}}
         run: |
           mypy src
+
+  codecov:
+    if: ${{inputs.codecov}}
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download coverage artefact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true
+          name: geompy-codecov-${{inputs.os}}-py${{inputs.py}}
+          path: .temp/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          file: .temp/coverage.xml
+          flags: py${{inputs.py}}
+          name: tests
+          # https://docs.codecov.com/docs/commit-status#disabling-a-status
+          token: ${{ secrets.codecov_token }}
+          verbose: true
+      - name: Delete coverage artefact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          failOnError: false
+          name: |
+            geompy-codecov-${{inputs.os}}-py${{inputs.py}}
