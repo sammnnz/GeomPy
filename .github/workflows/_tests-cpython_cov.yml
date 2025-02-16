@@ -1,6 +1,8 @@
 name: _Tests cpython coverage
 
 on:
+    push:
+        branches: [te-*]
     workflow_dispatch:
 
 jobs:
