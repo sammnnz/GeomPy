@@ -18,7 +18,7 @@ jobs:
         - name: Install dependencies
           run: |
             python -m pip install --upgrade pip
-            pip install -e .[testing]
+            pip install -e .[testing] --verbose
         - name: Check gcc
           continue-on-error: true
           run: |
@@ -29,6 +29,9 @@ jobs:
           run: |
             gcov --version
           shell: bash
+        - name: Build extension
+          run: |
+            python3 setup.py build_ext --verbose
         - name: Checks
           run: |
             echo "${{github.workspace}}"
