@@ -29,35 +29,21 @@ jobs:
             python3 setup.py build_ext --verbose
         - name: Checks
           run: |
-            find ${{github.workspace}}/build
-            find ${{github.workspace}}/tests
-            CFLAGS='--coverage --std=c99 -Wall -g3 -O0'
+            CFLAGS='--coverage --std=c99 -Wall -g3 -O0 --verbose'
+            include='${{env.pythonLocation}}/include/python3.9' # default: Ubuntu
+            ext='so'                                            # default: Ubuntu 
             if [[ '' =~ ^windows.* ]]; then
                 include='${{env.pythonLocation}}/include'
                 ext='pyd'
-            elif [[ 'ubuntu-latest' =~ ^ubuntu.* ]]; then
-                include='${{env.pythonLocation}}/include/python3.9'
-                ext='so'
             fi
-
-            echo $include
-            echo $ext
-
             libfile=`find build -type f -name *.$ext`
             libfile_wo_ext=`basename $libfile .$ext`
             libpath=`dirname $libfile`
-            LIBPATHS=''
+            LIBPATHS='-lpython3.9'                              # default: Ubuntu
             if [[ '' =~ ^windows.* ]]; then
                 LIBPATHS='-lpython39 -l$libfile_wo_ext'
             fi
-
-            echo $libfile
-            echo $libfile_wo_ext
-            echo $libpath
-            echo $LIBPATHS
-
             gcc $CFLAGS -c tests/cpython/c/test__geompy.c -o tests/cpython/c/test__geompy.o -I"$include"
-            echo "OK"
             gcc $CFLAGS -o tests/cpython/c/test__geompy tests/cpython/c/test__geompy.o -L${{env.LD_LIBRARY_PATH}} -L"$libpath" $LIBPATHS
             ./tests/cpython/c/test__geompy
             find ${{github.workspace}}/build
